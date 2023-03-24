@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "74550325964",
+    "project_id": "glasses-store-65124",
+    "storage_bucket": "glasses-store-65124.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74550325964:android:c432d0eb88f5971fd24869",
+        "android_client_info": {
+          "package_name": "com.example.glassesstore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "74550325964-rjk7lbrfnbikqllmmtjjg9i53v9efrbc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.glassesstore",
+            "certificate_hash": "e463958d6520da87bee80546efff99d3e385e8bf"
+          }
+        },
+        {
+          "client_id": "74550325964-h0lsl63qfhks6osc5ouv1kfd7dqe8sto.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoEE282xM3Hksi7ANwY7brbErDg8UJI8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "74550325964-h0lsl63qfhks6osc5ouv1kfd7dqe8sto.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
