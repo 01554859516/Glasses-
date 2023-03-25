@@ -1,21 +1,16 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/custom_button.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/common/custom_textform.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/snakbar.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/config/cashehelper.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/config/endpoint.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/constant/size_manger.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/provider/google_singin.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admin_home.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admincheck.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/forgotpassword_page.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/forgotpasswordverification.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/home_screen.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/registration_page.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/screen/otb_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/widgets/header_widget.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/widgets/navigagton.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/widgets/textfromfiled.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool? admin;
@@ -26,40 +21,65 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  bool isVisable = false;
+  final phoneController = TextEditingController();
+  bool? isLoading;
 
-  Future<bool> singIn() async {
-    bool isLogin = false;
+  Future<void> singIn() async {
+    setState(() {
+      isLoading = true;
+    });
+    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
     try {
-      User? user = (await FirebaseAuth.instance.signInWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim()))
-          .user;
-      if (user != null) {
-        setState(() {
-          uid = user.uid;
-          CacheHelper.savedata(key: 'uid', value: user.uid);
-          isLogin = true;
-        });
-      }
-      return isLogin;
+      final String phonenumber = phoneController.text.trim();
+
+      await firebaseAuth.verifyPhoneNumber(
+        phoneNumber: "+${country.phoneCode}$phonenumber",
+        verificationCompleted: (phoneAuthCredential) async {
+          await firebaseAuth.signInWithCredential(phoneAuthCredential);
+        },
+        verificationFailed: (error) {
+          throw Exception(error.toString());
+        },
+        codeSent: (verificationId, forceResendingToken) {
+          navigtonto(
+            context,
+            OtbScreen(verificationId: verificationId, admin: widget.admin),
+          );
+        },
+        codeAutoRetrievalTimeout: (verificationId) {},
+      );
+      setState(() {
+        isLoading = false;
+      });
     } on FirebaseAuthException catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       showSnakBar(context, "Error : ${e.code}");
-      return isLogin;
     }
   }
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    phoneController.dispose();
+
     super.dispose();
   }
 
   final double _headerHeight = 190;
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
+  Country country = Country(
+      phoneCode: '20',
+      countryCode: 'EG',
+      e164Sc: 0,
+      geographic: true,
+      level: 1,
+      name: 'Egypt',
+      example: 'Egypt',
+      displayName: 'Egypt',
+      displayNameNoCountryCode: 'EG',
+      e164Key: '');
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             Container(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-              margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+              
               child: Column(
                 children: [
                   const Text(
@@ -100,152 +120,107 @@ class _LoginScreenState extends State<LoginScreen> {
                     key: _globalKey,
                     child: Column(
                       children: [
-                        CustomFormTextfield(
-                          controller: emailController,
-                          validator: (email) {
-                            return email!.isNotEmpty
-                                ? null
-                                : "Enter a valid Email";
-                          },
-                          type: TextInputType.emailAddress,
-                          lableText: "Email",
-                          hintText: "Enter your Email",
-                          prefix: Icons.email,
-                          obscure: false,
-                        ),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
-                        CustomFormTextfield(
-                          validator: (value) {
-                            return value!.length < 4
-                                ? "Enter at lest 8 Characters"
-                                : null;
-                          },
-                          controller: passwordController,
-                          type: TextInputType.visiblePassword,
-                          lableText: "Password",
-                          hintText: "Enter your Password",
-                          prefix: Icons.lock,
-                          obscure: isVisable ? false : true,
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                isVisable = !isVisable;
-                              });
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: MyTextFromField(
+                            controller: phoneController,
+                            textInputType: TextInputType.phone,
+                            color: Colors.purple.withOpacity(0.1),
+                            hinttext: 'Enter phone number',
+                            onChange: (value) {
+                              if (phoneController.text.length < 12) {
+                                setState(() {});
+                              }
                             },
-                            icon: isVisable
-                                ? const Icon(Icons.visibility)
-                                : const Icon(Icons.visibility_off),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 15.0,
-                        ),
-                        Container(
-                          margin: const EdgeInsets.fromLTRB(10, 0, 10, 20),
-                          alignment: Alignment.topRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ForgotPasswordPage()),
-                              );
-                            },
-                            child: const Text(
-                              "forgot your password?",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ),
-                        CustomBotton(
-                          onPressed: () {
-                            if (_globalKey.currentState!.validate()) {
-                              {
-                                singIn().then((value) {
-                                  if (value) {
-                                    if (FirebaseAuth.instance.currentUser!
-                                            .emailVerified ==
-                                        false) {
-                                      navigtonandfinish(
-                                          context, const VerifyEmailpage());
-                                    } else {
-                                      if (widget.admin != null) {
+                            perfixicon: Container(
+                              padding: const EdgeInsets.all(8),
+                              child: InkWell(
+                                  onTap: () {
+                                    showCountryPicker(
+                                      context: context,
+                                      countryListTheme: CountryListThemeData(
+                                          bottomSheetHeight:
+                                              AppSizes.height(context) * 0.6),
+                                      onSelect: (value) {
                                         setState(() {
-                                          admin = 'admin';
-                                          CacheHelper.savedata(
-                                              key: 'admin', value: 'admin');
+                                          country = value;
                                         });
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const AdiminHome()));
-                                      } else {
-                                        navigtonandfinish(
-                                            context, const HomeScreen());
+                                      },
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(3),
+                                    child: Text(
+                                        '${country.flagEmoji} + ${country.phoneCode}',
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                  )),
+                            ),
+                            suifxicon: phoneController.text.length > 10
+                                ? const CircleAvatar(
+                                    backgroundColor: Colors.purple,
+                                    radius: 15,
+                                    child: Icon(
+                                      Icons.done,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: Column(
+                            children: [
+                              if (isLoading == true)
+                                const CircularProgressIndicator(
+                                    color: Colors.purple),
+                              if (isLoading != true)
+                                CustomBotton(
+                                  onPressed: () async {
+                                    if (_globalKey.currentState!.validate()) {
+                                      {
+                                        if (phoneController.text.trim().length >
+                                            10) {
+                                          await singIn();
+                                        }
                                       }
                                     }
-                                  }
-                                });
-                              }
-                            }
-                          },
-                          text: 'Login',
-                          width: 200.0,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Don\"t have an account?"),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegistrationPage()),
-                                );
-                              },
-                              child: Text(
-                                "Create",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
+                                  },
+                                  text: 'Login',
+                                  width: 200.0,
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                          width: 299,
-                          child: Row(
-                            children: const [
-                              Expanded(
-                                child: Divider(
-                                  thickness: 0.6,
-                                  color: Color.fromARGB(255, 205, 7, 255),
-                                ),
-                              ),
-                              Text(
-                                "oR",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 205, 7, 255),
-                                ),
-                              ),
-                              Expanded(
-                                child: Divider(
-                                  thickness: 0.6,
-                                  color: Color.fromARGB(255, 205, 7, 255),
-                                ),
-                              ),
                             ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 90),
+                          child: SizedBox(
+                            width: 299,
+                            child: Row(
+                              children: const [
+                                Expanded(
+                                  child: Divider(
+                                    thickness: 0.6,
+                                    color: Color.fromARGB(255, 205, 7, 255),
+                                  ),
+                                ),
+                                Text(
+                                  "oR",
+                                  style: TextStyle(
+                                    color: Color.fromARGB(255, 205, 7, 255),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Divider(
+                                    thickness: 0.6,
+                                    color: Color.fromARGB(255, 205, 7, 255),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         Container(

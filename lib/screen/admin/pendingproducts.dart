@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/snakbar.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/constant/them.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admin_home.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/screen/products/check_topay.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/widgets/navigagton.dart';
 
 class PendingProducts extends StatelessWidget {
   const PendingProducts({super.key});
@@ -116,105 +118,119 @@ class ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      height: MediaQuery.of(context).size.height * 0.2,
-      child: Row(
-        children: [
-          Stack(
-            alignment: AlignmentDirectional.bottomStart,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image(
-                  image: NetworkImage('${snap['productsImage']}'),
-                  width: MediaQuery.of(context).size.width * 0.36,
-                  height: MediaQuery.of(context).size.height * 0.35,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            width: 20.0,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () {
+        if (isCheckout == true) {
+          List<String> cartIds = [];
+          cartIds.add(snap['productId']);
+          navigtonto(
+              context,
+              CheckToPay(
+                totalPrice: double.parse(snap['productPrice']),
+                cartId: cartIds,
+              ));
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        height: MediaQuery.of(context).size.height * 0.2,
+        child: Row(
+          children: [
+            Stack(
+              alignment: AlignmentDirectional.bottomStart,
               children: [
-                Text(
-                  snap['productName'],
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(
-                  height: 2,
-                ),
-                Text(snap['productDescription'],
-                    maxLines: 6,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall),
-                const Spacer(),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Text(
-                        snap['productPrice'],
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.purple,
-                        ),
-                      ),
-                      const Spacer(),
-                      if (isCheckout == false)
-                        InkWell(
-                          onTap: () {
-                            confirmProducts(
-                              context,
-                              snap['productId'],
-                              snap['productsImage'],
-                              snap['productName'],
-                              snap['productPrice'],
-                              snap['productDescription'],
-                              snap['productCatgeroy'],
-                            ).whenComplete(
-                                () => delet(context, snap['productId']));
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            child: Text(
-                              'Confirm',
-                              style:
-                                  TextStyle(fontSize: 17, color: Colors.purple),
-                            ),
-                          ),
-                        ),
-                      if (isCheckout == true)
-                        InkWell(
-                          onTap: () {
-                            delet(context, snap['productId']).whenComplete(() =>
-                                showSnakBar(
-                                    context, 'Product Delated successfully'));
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
-                            child: Icon(
-                              Icons.delete,
-                              color: Colors.purple,
-                            ),
-                          ),
-                        )
-                    ],
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image(
+                    image: NetworkImage('${snap['productsImage']}'),
+                    width: MediaQuery.of(context).size.width * 0.36,
+                    height: MediaQuery.of(context).size.height * 0.35,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(
+              width: 20.0,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    snap['productName'],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 2,
+                  ),
+                  Text(snap['productDescription'],
+                      maxLines: 6,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall),
+                  const Spacer(),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          snap['productPrice'],
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Colors.purple,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (isCheckout == false)
+                          InkWell(
+                            onTap: () {
+                              confirmProducts(
+                                context,
+                                snap['productId'],
+                                snap['productsImage'],
+                                snap['productName'],
+                                snap['productPrice'],
+                                snap['productDescription'],
+                                snap['productCatgeroy'],
+                              ).whenComplete(
+                                  () => delet(context, snap['productId']));
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              child: Text(
+                                'Confirm',
+                                style: TextStyle(
+                                    fontSize: 17, color: Colors.purple),
+                              ),
+                            ),
+                          ),
+                        if (isCheckout == true)
+                          InkWell(
+                            onTap: () {
+                              delet(context, snap['productId']).whenComplete(
+                                  () => showSnakBar(
+                                      context, 'Product Delated successfully'));
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.purple,
+                              ),
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

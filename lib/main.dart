@@ -12,6 +12,7 @@ import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admin_home.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/forgotpasswordverification.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/home_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/login_screen.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/screen/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,16 +25,11 @@ Future<void> main() async {
   token = CacheHelper.getData(key: 'token');
   admin = CacheHelper.getData(key: 'admin');
   if (uid != null) {
-    if (FirebaseAuth.instance.currentUser!.emailVerified == false) {
-      FirebaseAuth.instance.currentUser!.sendEmailVerification();
-      widget = const VerifyEmailpage();
-    } else {
-      widget = admin == null ? const HomeScreen() : const AdiminHome();
-    }
+    widget = admin == null ? const HomeScreen() : const AdiminHome();
   } else if (admin != null) {
     widget = const AdiminHome();
   } else {
-    widget = const LoginScreen();
+    widget = const SplashSceen();
   }
   runApp(MyApp(
     startwidget: widget,

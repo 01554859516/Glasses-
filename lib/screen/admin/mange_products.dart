@@ -202,7 +202,8 @@ class _MangeProductsState extends State<MangeProducts> {
                               });
                             } else {}
                           },
-                          child: Stack(
+                          child:
+                           Stack(
                             alignment: Alignment.bottomRight,
                             children: [
                               CircleAvatar(
@@ -274,7 +275,7 @@ class _MangeProductsState extends State<MangeProducts> {
                     hintText:  'Children, Men, Woman',
                     textInputType: TextInputType.text,
                     validator: (cat) {
-                      if (cat != 'Children' && cat != 'Men' && cat != 'Woman') {
+                      if (cat != 'Children' && cat != 'Man' && cat != 'Woman') {
                         return 'No Catgeroy found';
                       }
                       return null;

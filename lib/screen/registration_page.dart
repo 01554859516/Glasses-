@@ -1,59 +1,66 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/custom_button.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/custom_textform.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/snakbar.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/config/cashehelper.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/config/endpoint.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/login_screen.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admin_home.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/screen/home_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/widgets/header_widget.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/widgets/navigagton.dart';
 
 class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key});
+  final bool? admin;
+  final String myuid;
+  const RegistrationPage({super.key, this.admin, required this.myuid});
 
   @override
   State<RegistrationPage> createState() => _RegistrationPageState();
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  bool isVisable = true;
+  File? image;
+  bool? isLoading;
+
   final _formKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final phoneController = TextEditingController();
-  final userNameController = TextEditingController();
+  final fristNameController = TextEditingController();
 
-  register() async {
+  final lastNameController = TextEditingController();
+  final birthdATEController = TextEditingController();
+
+  Future<void> register() async {
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      if (credential.user != null) {
-        setState(() {
-          credential.user!.sendEmailVerification();
-          uid = credential.user!.uid;
-          CacheHelper.savedata(key: 'uid', value: credential.user!.uid);
-        });
-      }
-
+      var ref = await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('products/${Uri.file(image!.path).pathSegments.last}')
+          .putFile(image!);
+      var imageUrl = await ref.ref.getDownloadURL();
       CollectionReference users =
           FirebaseFirestore.instance.collection("glasses");
 
-      users
-          .doc(credential.user!.uid)
-          .set({
-            "username": userNameController.text,
-            "phone": phoneController.text,
-            "email": emailController.text,
-            "password": passwordController.text,
-          })
-          // ignore: avoid_print
-          .then((value) => print("User Added"))
-          // ignore: avoid_print
-          .catchError((error) => print("Failed to add user: $error"));
+      users.doc(widget.myuid).set({
+        "FristName": fristNameController.text,
+        "LastName": lastNameController.text,
+        "birthDate": birthdATEController.text,
+        "image": imageUrl
+      });
+      setState(() {
+        uid = widget.myuid;
+        CacheHelper.savedata(key: 'uid', value: widget.myuid);
+
+        if (widget.admin != null) {
+          admin = 'admin';
+          CacheHelper.savedata(key: 'admin', value: 'admin');
+          navigtonandfinish(context, const AdiminHome());
+        } else {
+          navigtonandfinish(context, const HomeScreen());
+        }
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         showSnakBar(context, 'The password provided is too weak.');
@@ -70,10 +77,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final double _headerHeight = 190;
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    phoneController.dispose();
-    userNameController.dispose();
+    fristNameController.dispose();
+    birthdATEController.dispose();
+    lastNameController.dispose();
+
     super.dispose();
   }
 
@@ -91,8 +98,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.fromLTRB(25, 50, 25, 10),
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              margin: const EdgeInsets.only(
+                top: 170,
+              ),
               alignment: Alignment.center,
               child: Column(
                 children: [
@@ -100,121 +109,113 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        Container(
-                          alignment: Alignment.bottomLeft,
-                          height: 200,
-                          child: const Text(
-                            "Register",
-                            style: TextStyle(
-                              fontSize: 28,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: InkWell(
+                            onTap: () async {
+                              var pick = ImagePicker();
+                              final pickimage = await pick.pickImage(
+                                  source: ImageSource.gallery);
+                              if (pickimage != null) {
+                                setState(() {
+                                  image = File(pickimage.path);
+                                });
+                              }
+                            },
+                            child: Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: image != null
+                                      ? FileImage(image!) as ImageProvider
+                                      : const NetworkImage(
+                                          'https://cdn-icons-png.flaticon.com/512/812/812850.png?w=740&t=st=1679253272~exp=1679253872~hmac=773faf8983ded274b9c5c84fb661bb434cc41fc9c8163e08a25e4a3f671cd6da',
+                                        ),
+                                  radius: 72,
+                                ),
+                                const CircleAvatar(
+                                  radius: 17,
+                                  backgroundColor: Color(0xff8A02AE),
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                    size: 22,
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 50,
-                        ),
                         CustomFormTextfield(
-                          controller: userNameController,
+                          controller: fristNameController,
                           type: TextInputType.name,
-                          lableText: "UserName",
-                          hintText: "Enter your UserName",
+                          lableText: "FritName",
+                          hintText: "Enter your FritName",
                           prefix: Icons.person,
                           obscure: false,
+                          validator: (e) {
+                            if (e!.isEmpty) {
+                              return "Empty value";
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 20.0),
                         CustomFormTextfield(
-                          controller: phoneController,
-                          type: TextInputType.phone,
-                          lableText: "Phone",
-                          hintText: "Enter your Phone",
-                          prefix: Icons.phone,
+                          controller: lastNameController,
+                          type: TextInputType.name,
+                          lableText: "LastName",
+                          hintText: "Enter your LastName",
+                          prefix: Icons.person_2,
                           obscure: false,
                           suffixIcon: null,
+                          validator: (e) {
+                            if (e!.isEmpty) {
+                              return "Empty value";
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 20.0),
                         CustomFormTextfield(
-                          validator: (email) {
-                            return email!.contains(RegExp(
-                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_'{|}~]+@[a-zA-Z]+"))
-                                ? null
-                                : "Enter a valid Email";
+                          validator: (e) {
+                            if (e!.isEmpty) {
+                              return "Empty value";
+                            }
+                            return null;
                           },
-                          controller: emailController,
-                          type: TextInputType.text,
-                          lableText: "Email",
-                          hintText: "Enter your Email",
-                          prefix: Icons.email,
+                          controller: birthdATEController,
+                          type: TextInputType.datetime,
+                          lableText: "datetime",
+                          hintText: "Enter your datetime",
+                          prefix: Icons.schedule_sharp,
                           obscure: false,
                         ),
-                        const SizedBox(height: 20.0),
-                        CustomFormTextfield(
-                          validator: (value) {
-                            return value!.length < 8
-                                ? "Enter at lest 8 Characters"
-                                : null;
-                          },
-                          controller: passwordController,
-                          type: TextInputType.visiblePassword,
-                          lableText: "Password",
-                          hintText: "Enter your Password",
-                          prefix: Icons.lock,
-                          obscure: isVisable ? true : false,
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                isVisable = !isVisable;
-                              });
-                            },
-                            icon: isVisable
-                                ? const Icon(Icons.visibility)
-                                : const Icon(Icons.visibility_off),
-                          ),
-                        ),
                         const SizedBox(height: 60),
-                        CustomBotton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              await register();
-                              if (!mounted) return;
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const LoginScreen()));
-                            } else {
-                              showSnakBar(context, "Error...");
-                            }
-                          },
-                          text: 'Register',
-                          width: 200.0,
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Column(
                           children: [
-                            const Text("Don\"t have an account?"),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const LoginScreen()),
-                                );
-                              },
-                              child: Text(
-                                "Sign in",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
+                            if (isLoading == true)
+                              const CircularProgressIndicator(
+                                  color: Colors.purple),
+                            if (isLoading != true)
+                              CustomBotton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    if (image != null) {
+                                      register().whenComplete(() =>
+                                          navigtonandfinish(
+                                              context, const HomeScreen()));
+                                    } else {
+                                      showSnakBar(context, 'No image selcated');
+                                    }
+                                  } else {
+                                    showSnakBar(context, "Error...");
+                                  }
+                                },
+                                text: 'Register',
+                                width: 200.0,
                               ),
-                            ),
                           ],
                         ),
                       ],

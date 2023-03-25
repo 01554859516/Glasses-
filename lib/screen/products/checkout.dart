@@ -87,7 +87,7 @@ class CheckOut extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 20),
                           child: CustomBotton(
-                            text: "pay",
+                            text: "pay All",
                             width: 150,
                             onPressed: () {
                               double totalProductPrice =
@@ -105,8 +105,12 @@ class CheckOut extends StatelessWidget {
                                 totalProductPrice +=
                                     productPrice; // Add it to the total
                               }
-                              navigtonto(context,
-                                  CheckToPay(totalPrice: totalProductPrice,cartId: cartIds,));
+                              navigtonto(
+                                  context,
+                                  CheckToPay(
+                                    totalPrice: totalProductPrice,
+                                    cartId: cartIds,
+                                  ));
                             },
                           ),
                         ),

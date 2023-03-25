@@ -120,6 +120,11 @@ class Wating extends StatelessWidget {
                                             snap['datetime'].toDate(), true),
                                         heatText: 'sending From: ',
                                       ),
+                                      ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child:
+                                              Image.network(snap['LensSize'])),
                                     ],
                                   ),
                                 ),
@@ -172,6 +177,7 @@ class DilagItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20))),
           ),
           onPressed: () {
+            Navigator.of(context).pop();
             navigtonto(
                 context,
                 AcitonForWating(
@@ -202,14 +208,14 @@ class DilagItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20))),
           ),
           onPressed: () {
-             navigtonto(
+            Navigator.of(context).pop();
+            navigtonto(
                 context,
                 AcitonForWating(
                   head: '${snap['orderNumber']}',
                   snap: snap,
                   isConfirm: true,
                 ));
-            
           },
           label: const Text(
             'Confirm',

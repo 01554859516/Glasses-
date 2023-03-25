@@ -29,14 +29,15 @@ class GlassesMen extends StatelessWidget {
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("images/Amr.png"),
-                  //fit: BoxFit.cover,
+                  fit: BoxFit.cover,
                 ),
               ),
-              // currentAccountPicture: CircleAvatar(
-              //   backgroundImage: AssetImage("images/amr.jpg"),
-              // ),
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: NetworkImage(snap['image']),
+                
+              ),
               accountEmail: Text(
-                "${snap['email']}",
+                "${FirebaseAuth.instance.currentUser?.phoneNumber}",
                 style: const TextStyle(
                   color: Colors.black54,
                   fontWeight: FontWeight.bold,
@@ -44,7 +45,7 @@ class GlassesMen extends StatelessWidget {
                 ),
               ),
               accountName: Text(
-                "${snap['username']}",
+                "${snap['FristName']}$snap['LastName']",
                 style: const TextStyle(
                   color: Colors.black54,
                   fontWeight: FontWeight.bold,

@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:math';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/appbar.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/snakbar.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/config/cashehelper.dart';
@@ -32,6 +34,7 @@ class _CheckToPayState extends State<CheckToPay> {
   final formKey = GlobalKey<FormState>();
   int number = 1;
   final ScrollController scrollController = ScrollController();
+  File? image;
 
   Future<void> gettoken() async {
     try {
@@ -73,31 +76,46 @@ class _CheckToPayState extends State<CheckToPay> {
     String watingId = const Uuid().v1();
 
     try {
-      await FirebaseFirestore.instance.collection('Watting').doc(watingId).set({
-        'Adress1': controllerAdress1.text.trim(),
-        'Adress2': controllerAdress2.text.trim(),
-        'Code': controllerCode.text.trim(),
-        'LensesType': controllerLens.text.trim(),
-        'Optical': controllerOptical.text.trim(),
-        'totalprice': '${widget.totalPrice * number} \$ ',
-        'uid': uid,
-        'token': token,
-        'orderNumber': orderNumber,
-        'watingId': watingId,
-        'datetime': DateTime.now()
-      });
-      sendNotifiy(
-          uid,
-          'The order has been sent to the merchant to be reviewed. Please wait until the request is reviewed within a maximum period of 24 hours Your order number is',
-          orderNumber,
-          true
-          );
+      if (image != null) {
+        var ref = await firebase_storage.FirebaseStorage.instance
+            .ref()
+            .child('products/${Uri.file(image!.path).pathSegments.last}')
+            .putFile(image!);
+        var imageUrl = await ref.ref.getDownloadURL();
+        await FirebaseFirestore.instance
+            .collection('Watting')
+            .doc(watingId)
+            .set({
+          'Adress1': controllerAdress1.text.trim(),
+          'Adress2': controllerAdress2.text.trim(),
+          'Code': controllerCode.text.trim(),
+          'LensesType': controllerLens.text.trim(),
+          'Optical': controllerOptical.text.trim(),
+          'totalprice': '${widget.totalPrice * number} \$ ',
+          'uid': uid,
+          'token': token,
+          'orderNumber': orderNumber,
+          'watingId': watingId,
+          'datetime': DateTime.now(),
+          'LensSize': imageUrl
+        });
+        sendNotifiy(
+            uid,
+            'The order has been sent to the merchant to be reviewed. Please wait until the request is reviewed within a maximum period of 24 hours Your order number is',
+            orderNumber,
+            true);
 
-      deletCat();
+        deletCat();
 
-      setState(() {
-        isLoading = false;
-      });
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        showSnakBar(context, 'Image Not Selcated');
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -330,11 +348,57 @@ class _CheckToPayState extends State<CheckToPay> {
                 ],
               ),
             ),
+            InkWell(
+              onTap: () async {
+                var pick = ImagePicker();
+                final pickimage =
+                    await pick.pickImage(source: ImageSource.gallery);
+                if (pickimage != null) {
+                  setState(() {
+                    image = File(pickimage.path);
+                  });
+                } else {}
+              },
+              child: Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(top: 15, bottom: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                    color: Colors.purple.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(10)),
+                child: Column(
+                  children: const [
+                    Text(
+                      'Upload Image From Phone',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Icon(
+                        Icons.image,
+                        size: 30,
+                        color: Colors.purple,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
             MyButton(
                 text: 'Confirm Order',
                 function: () {
                   if (formKey.currentState!.validate()) {
-                    gettoken().whenComplete(() => confirmOrder().whenComplete(() => Navigator.of(context).pop()));
+                    if (image != null) {
+                      gettoken()
+                          .whenComplete(() => confirmOrder().whenComplete(() {
+                                Navigator.of(context).pop();
+                                showSnakBar(
+                                    context, 'Your Order Sucsfully Aded');
+                              }));
+                    } else {
+                      showSnakBar(context, 'Image Not Selcated');
+                    }
                   }
                 })
           ]),
