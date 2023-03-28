@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/config/endpoint.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/constant/them.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/products/checkout.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/products/selectionglasses.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/support.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +24,28 @@ class _HomeScreenState extends State<HomeScreen> {
       value: current,
       child: SafeArea(
         child: Scaffold(
+          floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 20, left: 45),
+              child: Align(
+                alignment: AlignmentDirectional.bottomStart,
+                child: FloatingActionButton(
+                    backgroundColor: Colors.green,
+                    onPressed: () async {
+                      String text = "Ineed help ihave some issue";
+                      String url =
+                          "https://wa.me/+2001554859516/?text=${Uri.encodeFull(text)}";
+                      if (await canLaunchUrl(Uri.parse(url))) {
+                        await launchUrl(Uri.parse(url),
+                            mode: LaunchMode.externalApplication);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    child: const FaIcon(
+                      FontAwesomeIcons.whatsapp,
+                      color: Colors.white,
+                    )),
+              )),
           bottomNavigationBar: BottomNavigationBar(
             backgroundColor: const Color(0xff8A02AE),
             currentIndex: index,
@@ -59,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(
-                    child:  CircularProgressIndicator(
+                    child: CircularProgressIndicator(
                       color: Colors.purple,
                     ),
                   );
@@ -67,10 +91,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   var snap = snapshot.data!.data() as Map<String, dynamic>;
                   return IndexedStack(
                     index: index,
-                    children:  [
+                    children: [
                       SelecationGlasses(snap: snap),
-          const CheckOut(),
-          const Support(),
+                      const CheckOut(),
+                      const Support(),
                     ],
                   );
                 }

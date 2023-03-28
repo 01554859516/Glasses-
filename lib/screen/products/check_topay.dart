@@ -14,6 +14,8 @@ import 'package:suuuuuuuuuuuuuuuuuuu/constant/notification.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/constants.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admin_home.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/mange_products.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/widgets/navigagton.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/widgets/whendone.dart';
 import 'package:uuid/uuid.dart';
 
 class CheckToPay extends StatefulWidget {
@@ -368,19 +370,22 @@ class _CheckToPayState extends State<CheckToPay> {
                     color: Colors.purple.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(10)),
                 child: Column(
-                  children: const [
-                    Text(
-                      'Upload Image From Phone',
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Icon(
-                        Icons.image,
-                        size: 30,
-                        color: Colors.purple,
+                  children: [
+                    if (image == null)
+                      const Text(
+                        'Upload Image From Phone',
+                        style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
-                    )
+                    if (image != null) Image.file(image!),
+                    if (image == null)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Icon(
+                          Icons.image,
+                          size: 30,
+                          color: Colors.purple,
+                        ),
+                      )
                   ],
                 ),
               ),
@@ -392,7 +397,7 @@ class _CheckToPayState extends State<CheckToPay> {
                     if (image != null) {
                       gettoken()
                           .whenComplete(() => confirmOrder().whenComplete(() {
-                                Navigator.of(context).pop();
+                                navigtonto(context, const WhenDone());
                                 showSnakBar(
                                     context, 'Your Order Sucsfully Aded');
                               }));

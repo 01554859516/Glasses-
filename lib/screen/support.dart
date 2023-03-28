@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Support extends StatelessWidget {
   const Support({super.key});
@@ -39,13 +40,34 @@ class Support extends StatelessWidget {
               size: 150,
               color: Colors.purple,
             ),
-            Text(
-              "To contact support and for complaints, please use the following number 01554859516",
-              textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge!
-                  .copyWith(color: Colors.purple),
+            Column(
+              children: [
+                Text(
+                    "To contact support and for complaints, please use the following number",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge),
+                InkWell(
+                  onTap: () async {
+                    String text = "Ineed help ihave some issue";
+                    String url =
+                        "https://wa.me/+2001554859516/?text=${Uri.encodeFull(text)}";
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(Uri.parse(url),
+                          mode: LaunchMode.externalApplication);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Text(
+                    "01554859516",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: Colors.purple),
+                  ),
+                ),
+              ],
             )
           ],
         ),

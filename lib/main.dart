@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +8,7 @@ import 'package:suuuuuuuuuuuuuuuuuuu/config/endpoint.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/provider/cart.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/provider/google_singin.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admin_home.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/forgotpasswordverification.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/home_screen.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/login_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/splash_screen.dart';
 
 Future<void> main() async {

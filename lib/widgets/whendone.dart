@@ -1,23 +1,23 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/login_screen.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/screen/products/checkout.dart';
 
-class SplashSceen extends StatefulWidget {
-  const SplashSceen({super.key});
+class WhenDone extends StatefulWidget {
+  const WhenDone({super.key});
 
   @override
-  State<SplashSceen> createState() => _SplashSceenState();
+  State<WhenDone> createState() => _WhenDone();
 }
 
-class _SplashSceenState extends State<SplashSceen> {
+class _WhenDone extends State<WhenDone> {
   @override
   void initState() {
     super.initState();
     Timer(
       const Duration(milliseconds: 3000),
       () => Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const LoginScreen())),
+          context, MaterialPageRoute(builder: (context) => const CheckOut())),
     );
     Timer(const Duration(milliseconds: 10), (() {
       setState(() {
@@ -46,18 +46,19 @@ class _SplashSceenState extends State<SplashSceen> {
         child: Stack(
           alignment: Alignment.center,
           children: const [
-            Image(
-              color: Colors.white70,
-              height: 210,
-              width: 210,
-              image: AssetImage(
-                "images/logo.png",
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: 80,
+              child: Icon(
+                Icons.done,
+                size: 120,
+                color: Colors.purple,
               ),
             ),
             Positioned(
               bottom: 260,
               child: Text(
-                "Glasses Store",
+                "Orader Is Comelete",
                 style: TextStyle(
                   color: Colors.white70,
                   fontWeight: FontWeight.bold,
@@ -66,14 +67,9 @@ class _SplashSceenState extends State<SplashSceen> {
                 ),
               ),
             ),
-            Positioned(
-              bottom: 100,
-              child: CircularProgressIndicator(),
-            ),
           ],
         ),
       ),
     );
-    
   }
 }

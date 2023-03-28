@@ -53,7 +53,9 @@ dependencies:
   http: ^0.13.5
   camera: ^0.10.3+2
   country_picker: ^2.0.20
-
+  url_launcher: ^6.1.10
+  font_awesome_flutter: ^10.4.0
+  flutter_native_splash: ^2.2.19
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -68,7 +70,10 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
+flutter_native_splash:
+      
+      color: "#c94277"
+      image: images/logo.png
 flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

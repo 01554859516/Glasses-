@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 class CameraAr extends StatefulWidget {
   final String image;
   final Map<String, dynamic> snap2;
+
   const CameraAr({super.key, required this.image, required this.snap2});
 
   @override
@@ -63,11 +64,9 @@ class CameraArs extends State<CameraAr> {
             if (snapshot.connectionState == ConnectionState.done) {
               return Stack(
                 children: [
-                  SizedBox(
-                      height: AppSizes.height(context),
-                      child: CameraPreview(controller)),
+                  CameraPreview(controller),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 60, left: 25),
+                    padding: const EdgeInsets.only(bottom: 100, left: 25),
                     child: Align(
                       alignment: AlignmentDirectional.center,
                       child: Image.network(
@@ -76,29 +75,35 @@ class CameraArs extends State<CameraAr> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Align(
-                      alignment: AlignmentDirectional.bottomCenter,
-                      child: FloatingActionButton(
-                          backgroundColor: Colors.purple,
-                          child: const Icon(
-                            Icons.shopping_cart_outlined,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            addToCart(
-                              context,
-                              widget.snap2['productsImage'],
-                              widget.snap2['productName'],
-                              widget.snap2['productPrice'],
-                              widget.snap2['productDescription'],
-                              widget.snap2['productCatgeroy'],
-                            ).whenComplete(() {
-                              Navigator.of(context).pop();
-                              showSnakBar(context, 'Item Aded');
-                            });
-                          }),
+                  Align(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    child: Container(
+                      width: double.infinity,
+                      height: AppSizes.getHight(context, 249),
+                      decoration: BoxDecoration(
+                        color: Colors.purple.withOpacity(0.3),
+                      ),
+                      child: Center(
+                        child: FloatingActionButton(
+                            backgroundColor: Colors.purple,
+                            child: const Icon(
+                              Icons.shopping_cart_outlined,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              addToCart(
+                                context,
+                                widget.snap2['productsImage'],
+                                widget.snap2['productName'],
+                                widget.snap2['productPrice'],
+                                widget.snap2['productDescription'],
+                                widget.snap2['productCatgeroy'],
+                              ).whenComplete(() {
+                                Navigator.of(context).pop();
+                                showSnakBar(context, 'Item Aded');
+                              });
+                            }),
+                      ),
                     ),
                   )
                 ],

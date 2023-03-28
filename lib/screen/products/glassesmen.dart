@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/appbar.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/common/snakbar.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/config/cashehelper.dart';
@@ -10,8 +11,8 @@ import 'package:suuuuuuuuuuuuuuuuuuu/screen/home_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/login_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/products/checkout.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/products/details_screen.dart';
-import 'package:suuuuuuuuuuuuuuuuuuu/screen/profile_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/widgets/navigagton.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class GlassesMen extends StatelessWidget {
@@ -22,6 +23,28 @@ class GlassesMen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 20, left: 45),
+          child: Align(
+            alignment: AlignmentDirectional.bottomStart,
+            child: FloatingActionButton(
+                backgroundColor: Colors.green,
+                onPressed: () async {
+                  String text = "Ineed help ihave some issue";
+                  String url =
+                      "https://wa.me/+2001554859516/?text=${Uri.encodeFull(text)}";
+                  if (await canLaunchUrl(Uri.parse(url))) {
+                    await launchUrl(Uri.parse(url),
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: const FaIcon(
+                  FontAwesomeIcons.whatsapp,
+                  color: Colors.white,
+                )),
+          )),
       drawer: Drawer(
         child: Column(
           children: [
@@ -34,7 +57,6 @@ class GlassesMen extends StatelessWidget {
               ),
               currentAccountPicture: CircleAvatar(
                 backgroundImage: NetworkImage(snap['image']),
-                
               ),
               accountEmail: Text(
                 "${FirebaseAuth.instance.currentUser?.phoneNumber}",
@@ -81,17 +103,6 @@ class GlassesMen extends StatelessWidget {
               title: const Text("About"),
               leading: const Icon(Icons.help_center),
               onTap: () {},
-            ),
-            ListTile(
-              title: const Text("profile page"),
-              leading: const Icon(Icons.person),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfilePage(),
-                    ));
-              },
             ),
             ListTile(
               title: const Text("Logout"),
