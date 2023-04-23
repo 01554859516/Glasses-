@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:deepar_flutter/deepar_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/config/endpoint.dart';
@@ -95,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       SelecationGlasses(snap: snap),
                       const CheckOut(),
                       const Support(),
+
                     ],
                   );
                 }

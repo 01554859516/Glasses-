@@ -1,4 +1,5 @@
 import 'package:country_picker/country_picker.dart';
+import 'package:deepar_flutter/deepar_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import 'package:suuuuuuuuuuuuuuuuuuu/common/snakbar.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/constant/size_manger.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/provider/google_singin.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/admin/admincheck.dart';
+import 'package:suuuuuuuuuuuuuuuuuuu/screen/deep_ar_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/screen/otb_screen.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/widgets/header_widget.dart';
 import 'package:suuuuuuuuuuuuuuuuuuu/widgets/navigagton.dart';
@@ -81,10 +83,25 @@ class _LoginScreenState extends State<LoginScreen> {
       displayNameNoCountryCode: 'EG',
       e164Key: '');
 
+  // final  DeepArController _controller = DeepArController();
+  //
+  // @override
+  // void initState() {
+  //
+  //   // setState(() {
+  //   //
+  //   // });
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context);
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //   },
+      // ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -97,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             Container(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-              
               child: Column(
                 children: [
                   const Text(
@@ -223,6 +239,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        CustomBotton(
+                          text: 'deep ar',
+                          width: double.infinity,
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DeepArScreen(),
+                                ));
+                          },
+                        ),
                         Container(
                           margin: const EdgeInsets.symmetric(vertical: 27),
                           child: Row(
@@ -261,7 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(color: Colors.purple),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
